@@ -69,7 +69,7 @@ def read_noise(noise_path, noise_types):
 # add "stationary" noise to Training
 train_noisy_files = add_noise(open('target_CoreTrainList.txt', 'r'),
           target_folder=os.path.join(target_root, 'train/noisy/'),
-          noise_info=read_noise('../noise_types/noise', ['car', 'engine',  'pink', 'wind1', 'cabin']),
+          noise_info=read_noise('../noise_types/stationary', ['car', 'engine',  'pink', 'wind1', 'cabin']),
           SNRs=[-12, -9, -6, -3, 0, 3, 6, 9, 12])
 
 
