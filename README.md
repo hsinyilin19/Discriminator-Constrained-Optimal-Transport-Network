@@ -1,4 +1,4 @@
-# DOTN: Discriminator Constrained Optimal Transport Network
+# DOTN: Discriminator-Constrained Optimal Transport Network
 
 This repository hosts the Pytorch codes for paper Unsupervised Noise Adaptive Speech Enhancement by Discriminator-Constrained Optimal Transport by Hsin-Yi Lin, Huan-Hsin Tseng, Xugang Lu and Yu Tsao.
 
