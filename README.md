@@ -8,27 +8,35 @@ This repository hosts the Pytorch codes for paper Unsupervised Noise Adaptive Sp
 DOTN performs unsupervised domain adaptation for speech enhancement (SE), using optimal transport (OT) for domain alignment and Wasserstein Generative Adversarial Network (WGAN) to goven the output speech quality. 
 
 
-## Datasets
+## Datasets & Preprocessing
+###  - Voice Bank corpus ([VCTK](https://datashare.ed.ac.uk/handle/10283/2791))
 
-### 1. Voice Bank corpus (VCTK)
+In `Data_preprocessing/processing_VCTK_Demand`:
+1. Download [DEMAND](https://zenodo.org/record/1227121#.YXgqnr_MKYY) noise (16-channel environmental noise recordings)
+2. Add paths of VCTK and DEMAND (noise) in `step1_process_noisy_VCTK_16k.py`
+3. Convert generated *.wav* files to *.pt* files using `step2_convert_to_pt.py`
 
-[VCTK](https://datashare.is.ed.ac.uk/handle/10283/3443) includes speech utterances by 110 English speakers with various accents.
+### - [TIMIT](https://catalog.ldc.upenn.edu/LDC93S1) Acoustic-Phonetic Continuous Speech Corpus
+In `Data_preprocessing/preprocessing_TIMIT`:
+1. Put TIMIT path in `step1_generate_clean_files.py` to generate clean speech
+2. Add path of `noise_types` folder in `step2_add_noise.py ` to mix clean speech with noise
+3. Convert generated *.wav* files to *.pt* files using `step3_convert_to_pt.py`
 
-### 2. DEMAND
+## Run Discriminator-Constrained Optimal Transport Network
+Provide generated data paths **data_path** & **pt_data_path** in `main.py`, and run ```python main.py```
 
-[DEMAND](https://zenodo.org/record/1227121#.YXgqnr_MKYY) contains 16-channel environmental noise recordings.
-
-
-### 3. TIMIT
-
-[TIMIT](https://catalog.ldc.upenn.edu/LDC93S1) contains recordings of 630 speakers of eight major dialects of American English.
 
 ## Prerequisites
 - [Python 3.8](https://www.python.org/)
-- [PyTorch 1.8.1+cu111](https://pytorch.org/)
-
+- [PyTorch 1.8](https://pytorch.org/)
+- [POT 0.8.0](https://pythonot.github.io/)
+- [librosa 0.8.1](https://librosa.org/doc/latest/index.html)
+- [pypesq 1.2.4](https://pypi.org/project/pypesq/)
+- [pystoi 0.3.3](https://pypi.org/project/pystoi/)
+- [Tensorboard 2.7.0](https://pypi.org/project/tensorboard/)
+- [scikit-learn 1.0.1](https://pypi.org/project/scikit-learn/)
+- [tqdm 4.62.3](https://pypi.org/project/tqdm/)
 
 
 ## Hardware
-- 1 GPU of 32 GB CUDA memory and 4 CPUs with 90 GB memory.
-
+- NVIDIA V100 (32 GB CUDA memory) and 4 CPUs.
