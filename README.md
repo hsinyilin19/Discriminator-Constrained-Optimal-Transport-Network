@@ -9,12 +9,13 @@ DOTN performs unsupervised domain adaptation for speech enhancement (SE), using 
 
 
 ## Datasets & Preprocessing
-###  - Voice Bank corpus ([VCTK](https://datashare.ed.ac.uk/handle/10283/2791))
+###  - [Voice Bank corpus](https://datashare.ed.ac.uk/handle/10283/2791) (VCTK)
 
 In `Data_preprocessing/processing_VCTK_Demand`:
-1. Download [DEMAND](https://zenodo.org/record/1227121#.YXgqnr_MKYY) noise (16-channel environmental noise recordings)
-2. Add paths of VCTK and DEMAND (noise) in `step1_process_noisy_VCTK_16k.py`
-3. Convert generated *.wav* files to *.pt* files using `step2_convert_to_pt.py`
+1. Download [clean_trainset_28spk_wav](https://datashare.ed.ac.uk/bitstream/handle/10283/2791/clean_trainset_28spk_wav.zip?sequence=2&isAllowed=y) and [clean_testset_wav](https://datashare.ed.ac.uk/bitstream/handle/10283/2791/clean_testset_wav.zip?sequence=1&isAllowed=y), two subsets of VCTK, and put them together in a larger folder, say `VCTK_noisy`.
+2. Download [DEMAND](https://zenodo.org/record/1227121#.YXgqnr_MKYY) noise (16-channel environmental noise recordings)
+3. Add paths of VCTK and DEMAND (noise) in `step1_process_noisy_VCTK_16k.py`
+4. Convert generated *.wav* files to *.pt* files using `step2_convert_to_pt.py`
 
 ### - [TIMIT](https://catalog.ldc.upenn.edu/LDC93S1) Acoustic-Phonetic Continuous Speech Corpus
 In `Data_preprocessing/preprocessing_TIMIT`:
