@@ -2,48 +2,29 @@ import os
 import numpy as np
 import librosa
 import scipy.io.wavfile as wav
-from shutil import copyfile
 from sklearn.model_selection import train_test_split
 import pathlib
 import pickle
 
-SR = 16000
-make_copy = True
-
-# select source & target domain noise from DEMAND dataset
-source_noise = ["TBUS", "TCAR", "TMETRO"]
-target_noise = ["SCAFE", "STRAFFIC", "SPSQUARE"]
-
-
-VCTK_path = '/mnt/Datasets/Corpus/noisy-vctk-16k'  # original VCTK path
-noise_path = '/mnt/Datasets/Corpus/DEMAND/data/'   # provide noise path
-save_folder = '/mnt/Datasets/Corpus/'              # folder saving generated audio
-
-# original VCTK Train, Test folders
-VCTK_train_path = os.path.join(VCTK_path, "clean_trainset_28spk_wav_16k/")
-VCTK_test_path = os.path.join(VCTK_path, "clean_testset_wav_16k/")
-source_domain = "_".join(source_noise)
-target_domain = "_".join(target_noise)
-
-
-# prepare folders for source & target domain data
-paths = {}
-for mode in ['train', 'test']:
-    for s in ['clean', 'noisy']:
-        path = os.path.join(save_folder, f"VCTK_DEMAND_{source_domain}_to_{target_domain}/{mode}/{s}/")
-        pathlib.Path(path).mkdir(parents=True, exist_ok=True)  # prepare folder
-        paths[f'{mode}_{s}'] = path
-
+original_SR = 48000
+new_SR = 16000
 
 def add_noise(clean_files, folder, noise_info, SNRs, output_path):
     noise_data, noise_types = noise_info
     for file in clean_files:
         clean_path = os.path.join(folder, file)
-        clean, _ = librosa.load(clean_path, sr=SR)
+        clean, _ = librosa.load(clean_path, sr=new_SR)
 
         for i, noise in enumerate(noise_data):
             for snr in SNRs:
                 generate_noisy(noise, clean, snr, output_path, noise_types[i], file)
+
+
+def resampling(input, output, original_sr=None, new_sr=16000):
+    y, _ = librosa.load(input, original_sr)
+    y_resampled = librosa.resample(y, original_sr, new_sr)
+    wav.write(output, new_sr, np.int16(y_resampled * 32767))
+    print(f'converting: {input}')
 
 
 def generate_noisy(noise, clean, SNR, output_path, noise_name, clean_name):
@@ -71,7 +52,7 @@ def generate_noisy(noise, clean, SNR, output_path, noise_name, clean_name):
         print(output_file)
     if not os.path.exists(os.path.dirname(output_file)):
         os.makedirs(os.path.dirname(output_file))
-    wav.write(output_file, SR, np.int16(output * 32767))
+    wav.write(output_file, new_SR, np.int16(output * 32767))
 
 
 def read_noise(noise_path, noise_types):
@@ -81,10 +62,36 @@ def read_noise(noise_path, noise_types):
         if not noise.endswith('.wav'):
             noise = noise + '.wav'
 
-        n, sr = librosa.load(os.path.join(noise_path, noise), sr=SR)
-        assert sr == SR, "Sampling rate != %s" % SR
+        n, sr = librosa.load(os.path.join(noise_path, noise), sr=new_SR)
+        assert sr == new_SR, "Sampling rate != %s" % new_SR
         noise_data.append(n)
     return noise_data, noise_types
+
+
+# select source & target domain noise from DEMAND dataset
+source_noise = ["TBUS", "TCAR", "TMETRO"]
+target_noise = ["SCAFE", "STRAFFIC", "SPSQUARE"]
+
+
+VCTK_path = '/mnt/Datasets/Corpus/VCTK_noisy'  # original VCTK path
+noise_path = '/mnt/DEMAND/data/'                   # provide noise path
+save_folder = '/mnt/Datasets/Corpus/'              # folder saving generated audio
+
+# original VCTK Train, Test folders
+VCTK_train_path = os.path.join(VCTK_path, "clean_trainset_28spk_wav/")
+VCTK_test_path = os.path.join(VCTK_path, "clean_testset_wav/")
+source_domain = "_".join(source_noise)
+target_domain = "_".join(target_noise)
+
+
+# prepare folders for source & target domain data
+paths = {}
+for mode in ['train', 'test']:
+    for s in ['clean', 'noisy']:
+        path = os.path.join(save_folder, f"VCTK_DEMAND_{source_domain}_to_{target_domain}/{mode}/{s}/")
+        pathlib.Path(path).mkdir(parents=True, exist_ok=True)  # prepare folder
+        paths[f'{mode}_{s}'] = path
+
 
 with open('speaker_info.pickle', 'rb') as handle:
     speaker_info = pickle.load(handle)
@@ -92,7 +99,6 @@ with open('male_speakers.pickle', 'rb') as handle:
     M = pickle.load(handle)
 with open('female_speakers.pickle', 'rb') as handle:
     F = pickle.load(handle)
-
 
 
 '''---------------- Step 1: prepare clean data for source (train) & target (test) domain ----------------'''
@@ -108,20 +114,24 @@ female_utterances = [x for x in female_utterances if x]  # remove empty female s
 train_list_M = male_utterances
 train_list_F = female_utterances
 
-
 # mixing male & female speakers
 train_clean_files = [file for spk in train_list_M for file in spk] + [file for spk in train_list_F for file in spk]
 test_clean_files = [file.name for file in os.scandir(VCTK_test_path) if file.name.endswith('.wav')]
 
-if make_copy:
-    for file in train_clean_files:
-        copyfile(os.path.join(VCTK_train_path, file), os.path.join(paths['train_clean'], file))
-    print('train clean prepared')
 
-    for file in test_clean_files:
-        copyfile(os.path.join(VCTK_test_path, file), os.path.join(paths['test_clean'], file))
-    print('test clean prepared')
+for file in train_clean_files:
+    resampling(input=os.path.join(VCTK_train_path, file),
+               output=os.path.join(paths['train_clean'], file),
+               original_sr=original_SR,
+               new_sr=new_SR)
+print('train clean prepared')
 
+for file in test_clean_files:
+    resampling(input=os.path.join(VCTK_test_path, file),
+               output=os.path.join(paths['test_clean'], file),
+               original_sr=original_SR,
+               new_sr=new_SR)
+print('test clean prepared')
 
 
 '''---------------- Step 2: add noise to clean ----------------'''
@@ -138,4 +148,3 @@ add_noise(test_clean_files,
           noise_info=read_noise(noise_path, target_noise),
           SNRs=[-9, -6, -3, 0, 3, 6, 9],
           output_path=paths['test_noisy'])
-
