@@ -13,7 +13,7 @@ DOTN performs unsupervised domain adaptation for speech enhancement (SE), using 
 
 In `Data_preprocessing/processing_VCTK_Demand`:
 1. Download [clean_trainset_28spk_wav](https://datashare.ed.ac.uk/bitstream/handle/10283/2791/clean_trainset_28spk_wav.zip?sequence=2&isAllowed=y) and [clean_testset_wav](https://datashare.ed.ac.uk/bitstream/handle/10283/2791/clean_testset_wav.zip?sequence=1&isAllowed=y) (two subsets of VCTK) and put them together in a larger folder, e.g., `VCTK_noisy`.
-2. Download preselected DEMAND noise files in `.../Data_preprocessing/processing_VCTK_Demand/DEMAND`
+2. Use preselected DEMAND noise files in `.../Data_preprocessing/processing_VCTK_Demand/DEMAND`
    - More noises from [DEMAND](https://zenodo.org/record/1227121#.YXgqnr_MKYY) (16-channel environmental noise recordings) can also be used, with modification required.
 3. Add paths of VCTK and DEMAND (noise): `VCTK_path` & `noise_path` in `step1_process_noisy_VCTK_16k.py`
 4. Convert generated *.wav* files to *.pt* files using `step2_convert_to_pt.py`
