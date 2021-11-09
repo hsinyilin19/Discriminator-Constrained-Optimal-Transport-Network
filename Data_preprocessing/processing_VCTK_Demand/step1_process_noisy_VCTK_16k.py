@@ -6,8 +6,6 @@ from sklearn.model_selection import train_test_split
 import pathlib
 import pickle
 
-original_SR = 48000
-new_SR = 16000
 
 def add_noise(clean_files, folder, noise_info, SNRs, output_path):
     noise_data, noise_types = noise_info
@@ -24,7 +22,7 @@ def resampling(input, output, original_sr=None, new_sr=16000):
     y, _ = librosa.load(input, original_sr)
     y_resampled = librosa.resample(y, original_sr, new_sr)
     wav.write(output, new_sr, np.int16(y_resampled * 32767))
-    print(f'converting: {input}')
+    print(f'converting {original_sr // 1e3}kHz -> {new_sr // 1e3}kHz: {input}')
 
 
 def generate_noisy(noise, clean, SNR, output_path, noise_name, clean_name):
@@ -68,14 +66,16 @@ def read_noise(noise_path, noise_types):
     return noise_data, noise_types
 
 
+original_SR = 48000
+new_SR = 16000
+
 # select source & target domain noise from DEMAND dataset
 source_noise = ["TBUS", "TCAR", "TMETRO"]
 target_noise = ["SCAFE", "STRAFFIC", "SPSQUARE"]
 
-
-VCTK_path = '/mnt/Datasets/Corpus/VCTK_noisy'  # original VCTK path
-noise_path = '/mnt/DEMAND/data/'                   # provide noise path
-save_folder = '/mnt/Datasets/Corpus/'              # folder saving generated audio
+VCTK_path = '/mnt/VCTK_noisy'  # original VCTK path
+noise_path = './DEMAND/'       # provide noise path
+save_folder = '/mnt/'          # folder saving the generated audio
 
 # original VCTK Train, Test folders
 VCTK_train_path = os.path.join(VCTK_path, "clean_trainset_28spk_wav/")
@@ -91,6 +91,13 @@ for mode in ['train', 'test']:
         path = os.path.join(save_folder, f"VCTK_DEMAND_{source_domain}_to_{target_domain}/{mode}/{s}/")
         pathlib.Path(path).mkdir(parents=True, exist_ok=True)  # prepare folder
         paths[f'{mode}_{s}'] = path
+
+
+# check if noise files exist (for step 2)
+for n_type in (source_noise + target_noise):
+    noise_file = os.path.join(noise_path, f'{n_type}.wav')
+    if not os.path.exists(noise_file):
+        raise Exception(f"{noise_file}: noise file not exist")
 
 
 with open('speaker_info.pickle', 'rb') as handle:
