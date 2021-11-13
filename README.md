@@ -1,6 +1,6 @@
 # DOTN: Discriminator-Constrained Optimal Transport Network
 
-This repository hosts the Pytorch codes for paper Unsupervised Noise Adaptive Speech Enhancement by Discriminator-Constrained Optimal Transport by Hsin-Yi Lin, Huan-Hsin Tseng, Xugang Lu and Yu Tsao.
+This repository hosts the Pytorch codes for paper [Unsupervised Noise Adaptive Speech Enhancement by Discriminator-Constrained Optimal Transport (NIPS 2021)](https://arxiv.org/abs/2111.06316) by Hsin-Yi Lin, Huan-Hsin Tseng, Xugang Lu and Yu Tsao.
 
 ## Model
 
@@ -42,3 +42,6 @@ For both cases (VCTK/TIMIT), provide generated data paths **data_path** & **pt_d
 
 ## Hardware
 - NVIDIA V100 (32 GB CUDA memory) and 4 CPUs.
+
+## Origin
+If you find this repo useful for your research, please consider citing the paper
