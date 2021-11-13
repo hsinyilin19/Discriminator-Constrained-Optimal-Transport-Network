@@ -42,6 +42,3 @@ For both cases (VCTK/TIMIT), provide generated data paths **data_path** & **pt_d
 
 ## Hardware
 - NVIDIA V100 (32 GB CUDA memory) and 4 CPUs.
-
-## Origin
-If you find this repo useful for your research, please consider citing the paper
